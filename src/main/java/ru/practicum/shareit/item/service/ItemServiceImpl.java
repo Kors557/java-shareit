@@ -26,13 +26,13 @@ public class ItemServiceImpl implements ItemService {
         checkOwner(userId);
         return inMemoryItemStorage.getAllOwnerItems(userId)
                 .stream()
-                .map(ItemMapper::mapToItemDto)
+                .map(ItemMapper::toItemDto)
                 .toList();
     }
 
     @Override
     public ItemDto getItem(long itemId) {
-        return ItemMapper.mapToItemDto(inMemoryItemStorage.getItem(itemId));
+        return ItemMapper.toItemDto(inMemoryItemStorage.getItem(itemId));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
                 .filter(item -> item.getAvailable() &&
                         (pattern.matcher(item.getName()).find() ||
                                 pattern.matcher(item.getDescription()).find()))
-                .map(ItemMapper::mapToItemDto)
+                .map(ItemMapper::toItemDto)
                 .toList();
     }
 
@@ -54,9 +54,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto addItem(long userId, ItemDto itemDto) {
         log.info("Adding new item: {}", itemDto);
         checkOwner(userId);
-        Item item = ItemMapper.mapToItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userId);
-        return ItemMapper.mapToItemDto(inMemoryItemStorage.addItem(item));
+        return ItemMapper.toItemDto(inMemoryItemStorage.addItem(item));
     }
 
     @Override
@@ -64,10 +64,10 @@ public class ItemServiceImpl implements ItemService {
         log.info("Updating existing item: {}", itemDto);
         checkOwner(userId);
         getItem(itemId);
-        Item item = ItemMapper.mapToItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userId);
         item.setId(itemId);
-        return ItemMapper.mapToItemDto(inMemoryItemStorage.updateItem(item));
+        return ItemMapper.toItemDto(inMemoryItemStorage.updateItem(item));
     }
 
     private void checkOwner(long userId) {

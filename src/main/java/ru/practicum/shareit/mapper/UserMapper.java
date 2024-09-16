@@ -1,11 +1,14 @@
 package ru.practicum.shareit.mapper;
 
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 public class UserMapper {
 
-    public static UserDto mapToUserDto(User user) {
+    public static UserDto toUserDto(User user) {
+        if (user == null) {
+            return null;
+        }
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -13,7 +16,10 @@ public class UserMapper {
                 .build();
     }
 
-    public static User mapToUser(UserDto userDto) {
+    public static User toUser(UserDto userDto) {
+        if (userDto == null) {
+            return null;
+        }
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())

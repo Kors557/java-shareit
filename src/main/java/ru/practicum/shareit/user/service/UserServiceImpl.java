@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.erorr.exception.ConflictException;
 import ru.practicum.shareit.mapper.UserMapper;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 
@@ -19,25 +19,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(long userId) {
-        return UserMapper.mapToUserDto(inMemoryUserStorage.getUser(userId));
+        return UserMapper.toUserDto(inMemoryUserStorage.getUser(userId));
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
         log.info("Creating new user: {}", userDto);
-        User user = UserMapper.mapToUser(userDto);
-        userValidate(user);
-        return UserMapper.mapToUserDto(inMemoryUserStorage.createUser(user));
+        User user = UserMapper.toUser(userDto);
+        validateDuplicateEmail(user.getEmail());
+        return UserMapper.toUserDto(inMemoryUserStorage.createUser(user));
     }
 
     @Override
     public UserDto updateUser(long userId, UserDto userDto) {
         log.info("Updating user: {}", userDto);
-        User user = UserMapper.mapToUser(userDto);
+        User user = UserMapper.toUser(userDto);
         getUser(userId);
         user.setId(userId);
-        userValidate(user);
-        return UserMapper.mapToUserDto(inMemoryUserStorage.updateUser(user));
+        validateDuplicateEmail(user.getEmail());
+        return UserMapper.toUserDto(inMemoryUserStorage.updateUser(user));
     }
 
     @Override
@@ -47,9 +47,9 @@ public class UserServiceImpl implements UserService {
         inMemoryUserStorage.deleteUser(userId);
     }
 
-    private void userValidate(User user) {
+    private void validateDuplicateEmail(String email) {
         if (inMemoryUserStorage.getAllUsers().stream()
-                .anyMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
+                .anyMatch(user1 -> user1.getEmail().equals(email))) {
             throw new ConflictException("Email already exists");
         }
     }
