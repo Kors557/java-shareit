@@ -17,34 +17,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemService itemServiceImpl;
+    private final ItemService itemService;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
 
     @GetMapping
     public List<ItemWithBookingsDto> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemServiceImpl.getAllOwnerItems(userId);
+        return itemService.getAllOwnerItems(userId);
     }
 
     @GetMapping("/{itemId}")
     public ItemWithBookingsDto getItem(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
-        return itemServiceImpl.getItem(userId, itemId);
+        return itemService.getItem(userId, itemId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> getItemsByText(@RequestParam String text) {
-        return itemServiceImpl.getItemsByText(text).stream().map(itemMapper::mapToItemDto).toList();
+        return itemService.getItemsByText(text).stream().map(itemMapper::mapToItemDto).toList();
     }
 
     @PostMapping
     public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) {
-        return itemMapper.mapToItemDto(itemServiceImpl.addItem(userId, itemDto));
+        return itemMapper.mapToItemDto(itemService.addItem(userId, itemDto));
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId,
                                  @PathVariable long itemId, @Valid @RequestBody CommentDto commentDto) {
-        return commentMapper.mapToCommentDto(itemServiceImpl.addComment(userId, itemId, commentDto));
+        return commentMapper.mapToCommentDto(itemService.addComment(userId, itemId, commentDto));
     }
 
     @PatchMapping("/{itemId}")
@@ -52,6 +52,6 @@ public class ItemController {
                               @PathVariable long itemId,
                               @RequestBody ItemDto itemDto) {
 
-        return itemMapper.mapToItemDto(itemServiceImpl.updateItem(userId, itemId, itemDto));
+        return itemMapper.mapToItemDto(itemService.updateItem(userId, itemId, itemDto));
     }
 }

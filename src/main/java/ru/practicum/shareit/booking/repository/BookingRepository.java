@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             where (b.booker.id = ?2 and b.id = ?1)
             or (i.owner.id = ?2 and b.id = ?1)
             """)
-    Optional<Booking> getUserBookingById(long bookingId, long bookerId);
+    Optional<Booking> getBookingIfOwnedByUser(long bookingId, long bookerId);
 
     List<Booking> findByBookerIdAndStatusOrderByStartDesc(long bookerId, BookingStatus status);
 

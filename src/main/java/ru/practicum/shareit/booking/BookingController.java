@@ -16,26 +16,27 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 public class BookingController {
-    private final BookingService bookingServiceImpl;
+
+    private final BookingService bookingService;
     private final BookingMapper bookingMapper;
 
     @PostMapping
     public BookingDto addBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                  @Valid @RequestBody RequestBookingDto requestBookingDto) {
-        return bookingMapper.mapToBookingDto(bookingServiceImpl.addBooking(userId, requestBookingDto));
+        return bookingMapper.mapToBookingDto(bookingService.addBooking(userId, requestBookingDto));
     }
 
     @PatchMapping("/{bookingId}")
     public BookingDto handleBookingApproval(@RequestHeader("X-Sharer-User-Id") long userId,
                                             @PathVariable long bookingId,
                                             @RequestParam boolean approved) {
-        return bookingMapper.mapToBookingDto(bookingServiceImpl.handleBookingApproval(userId, bookingId, approved));
+        return bookingMapper.mapToBookingDto(bookingService.handleBookingApproval(userId, bookingId, approved));
     }
 
     @GetMapping("{bookingId}")
     public BookingDto getUserBookingById(@RequestHeader("X-Sharer-User-Id") long userId,
                                          @PathVariable long bookingId) {
-        return bookingMapper.mapToBookingDto(bookingServiceImpl.getUserBookingById(userId, bookingId));
+        return bookingMapper.mapToBookingDto(bookingService.getUserBookingById(userId, bookingId));
     }
 
     @GetMapping
@@ -44,7 +45,7 @@ public class BookingController {
                                               @Positive @RequestParam(required = false) Integer from,
                                               @Positive @RequestParam(required = false) Integer size) {
         State stateEnum = State.fromString(state.toUpperCase());
-        return bookingServiceImpl.getAllUserBooking(userId, stateEnum, from, size)
+        return bookingService.getAllUserBooking(userId, stateEnum, from, size)
                 .stream().map(bookingMapper::mapToBookingDto).toList();
     }
 
@@ -54,7 +55,7 @@ public class BookingController {
                                                @Positive @RequestParam(required = false) Integer from,
                                                @Positive @RequestParam(required = false) Integer size) {
         State stateEnum = State.fromString(state.toUpperCase());
-        return bookingServiceImpl.getAllOwnerBooking(ownerId, stateEnum, from, size)
+        return bookingService.getAllOwnerBooking(ownerId, stateEnum, from, size)
                 .stream().map(bookingMapper::mapToBookingDto).toList();
     }
 }

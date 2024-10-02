@@ -17,6 +17,7 @@ import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.erorr.exception.AccessDeniedException;
 import ru.practicum.shareit.erorr.exception.EntityNotFoundException;
+import ru.practicum.shareit.erorr.exception.NotAuthorizedException;
 import ru.practicum.shareit.erorr.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -35,7 +36,6 @@ import static ru.practicum.shareit.booking.model.BookingStatus.WAITING;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BookingServiceImpl implements BookingService {
 
     private static final String LAST_BOOKING = "last";
@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Item is not available");
         }
         if (item.getOwner().getId() == bookerId) {
-            throw new EntityNotFoundException("User is not the owner of this booking");
+            throw new NotAuthorizedException("User is not the owner of this booking");
         }
         booking.setBooker(booker);
         booking.setItem(item);
@@ -64,14 +64,14 @@ public class BookingServiceImpl implements BookingService {
         Booking saveBooking = bookingRepository.save(booking);
         booking.setId(saveBooking.getId());
         log.info("Booking saved: {}", saveBooking);
-        return booking;
+        return saveBooking;
     }
 
     @Override
     public Booking handleBookingApproval(long ownerId, long bookingId, boolean approved) {
         log.info("Handling booking approval for user ID: {}, bookingId: {}", ownerId, bookingId);
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found" + bookingId));
         if (booking.getItem().getOwner().getId() != ownerId) {
             throw new AccessDeniedException("You are not allowed to approve this booking");
         }
@@ -88,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public Booking getUserBookingById(long bookerId, long bookingId) {
         log.info("Get booking ID {} for user ID {} ", bookingId, bookerId);
-        return bookingRepository.getUserBookingById(bookingId, bookerId)
+        return bookingRepository.getBookingIfOwnedByUser(bookingId, bookerId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
     }
 
