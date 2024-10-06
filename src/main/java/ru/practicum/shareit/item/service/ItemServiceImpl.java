@@ -140,6 +140,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public Item addItem(long userId, ItemDto itemDto) {
         log.info("Adding item {}", itemDto);
         User owner = userServiceImpl.getUser(userId);
@@ -151,6 +152,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public Comment addComment(long userId, long itemId, CommentDto commentDto) {
         log.info("Adding comment {}", commentDto);
         User user = userServiceImpl.getUser(userId);
@@ -170,6 +172,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public Item updateItem(long userId, long itemId, ItemDto itemDto) {
         log.info("Updating existing item: {}", itemDto);
         checkOwnerExist(userId);

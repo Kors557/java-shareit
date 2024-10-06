@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User createUser(UserDto userDto) {
         log.info("Adding user {}", userDto);
         User user = userRepository.save(userMapper.toUser(userDto));
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User updateUser(long userId, UserDto userDto) {
         log.info("Updating user {}", userDto);
         User user = getUser(userId);
@@ -49,6 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(long userId) {
         log.info("Deleting user with id {}", userId);
         userRepository.deleteById(userId);

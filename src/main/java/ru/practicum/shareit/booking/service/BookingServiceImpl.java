@@ -46,6 +46,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
+    @Transactional
     public Booking addBooking(long bookerId, RequestBookingDto requestBookingDto) {
         log.info("Adding booking: {}", requestBookingDto);
         User booker = userServiceImpl.getUser(bookerId);
@@ -68,6 +69,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public Booking handleBookingApproval(long ownerId, long bookingId, boolean approved) {
         log.info("Handling booking approval for user ID: {}, bookingId: {}", ownerId, bookingId);
         Booking booking = bookingRepository.findById(bookingId)
