@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @SpringBootTest
 class ShareItTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
-	@Test
-	void mainTest() {
-		assertDoesNotThrow(() -> ShareItServer.main(new String[]{}));
-	}
+    @Test
+    void mainTest() {
+        assertDoesNotThrow(() -> ShareItServer.main(new String[]{}));
+    }
 }

@@ -21,7 +21,6 @@ import ru.practicum.shareit.erorr.exception.NotAuthorizedException;
 import ru.practicum.shareit.erorr.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-
 import ru.practicum.shareit.mapper.BookingMapper;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
