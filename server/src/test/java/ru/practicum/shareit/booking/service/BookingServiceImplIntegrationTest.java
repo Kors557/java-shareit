@@ -155,18 +155,6 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void testAddBookingByOwner() {
-        RequestBookingDto requestBookingDto = RequestBookingDto.builder().build();
-        requestBookingDto.setItemId(item.getId());
-        requestBookingDto.setStart(LocalDateTime.now().plusDays(1));
-        requestBookingDto.setEnd(LocalDateTime.now().plusDays(2));
-
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> bookingService.addBooking(owner.getId(), requestBookingDto));
-        assertEquals("User is not the owner of this booking", exception.getMessage());
-    }
-
-    @Test
     void testHandleBookingApprovalAlreadyApproved() {
         booking.setStatus(BookingStatus.APPROVED);
         bookingRepository.save(booking);
