@@ -1,6 +1,7 @@
 package ru.practicum.shareit.mapper;
 
 
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.BookingDto;

@@ -1,8 +1,8 @@
 package ru.practicum.shareit.mapper;
 
 import org.mapstruct.Mapper;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.ItemRequest;
 
 @Mapper
 public interface ItemRequestMapper {
