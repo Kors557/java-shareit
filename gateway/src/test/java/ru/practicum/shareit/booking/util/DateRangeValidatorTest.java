@@ -1,13 +1,15 @@
 package ru.practicum.shareit.booking.util;
 
+import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import jakarta.validation.ConstraintValidatorContext;
 import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 class DateRangeValidatorTest {
     private DateRangeValidator validator;
@@ -32,6 +34,8 @@ class DateRangeValidatorTest {
                 .end(LocalDateTime.now().minusDays(1))
                 .build();
         assertFalse(validator.isValid(bookingDto, context));
+        verify(context).buildConstraintViolationWithTemplate("End date cannot be in the past");
+        verify(context).disableDefaultConstraintViolation();
     }
 
     @Test
@@ -41,6 +45,8 @@ class DateRangeValidatorTest {
                 .end(LocalDateTime.now().plusDays(1))
                 .build();
         assertFalse(validator.isValid(bookingDto, context));
+        verify(context).buildConstraintViolationWithTemplate("Start date cannot be in the past");
+        verify(context).disableDefaultConstraintViolation();
     }
 
     @Test
@@ -50,6 +56,8 @@ class DateRangeValidatorTest {
                 .end(LocalDateTime.now().plusDays(1))
                 .build();
         assertFalse(validator.isValid(bookingDto, context));
+        verify(context).buildConstraintViolationWithTemplate("Start date cannot be after the end date");
+        verify(context).disableDefaultConstraintViolation();
     }
 
     @Test
@@ -60,5 +68,23 @@ class DateRangeValidatorTest {
                 .build();
         assertTrue(validator.isValid(bookingDto, context));
     }
-}
 
+    @Test
+    void testNullDates() {
+        RequestBookingDto bookingDto = RequestBookingDto.builder().build();
+        assertFalse(validator.isValid(bookingDto, context));
+        verify(context).buildConstraintViolationWithTemplate("Start and end dates cannot be null");
+        verify(context).disableDefaultConstraintViolation();
+    }
+
+    @Test
+    void testStartEqualsEnd() {
+        RequestBookingDto bookingDto = RequestBookingDto.builder()
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(1))
+                .build();
+        assertFalse(validator.isValid(bookingDto, context));
+        verify(context).buildConstraintViolationWithTemplate("Start date cannot be the same as the end date");
+        verify(context).disableDefaultConstraintViolation();
+    }
+}
