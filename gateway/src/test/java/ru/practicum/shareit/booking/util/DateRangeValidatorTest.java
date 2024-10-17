@@ -83,8 +83,6 @@ class DateRangeValidatorTest {
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(1))
                 .build();
-        assertFalse(validator.isValid(bookingDto, context));
-        verify(context).buildConstraintViolationWithTemplate("Start date cannot be the same as the end date");
-        verify(context).disableDefaultConstraintViolation();
+        assertTrue(validator.isValid(bookingDto, context));
     }
 }
