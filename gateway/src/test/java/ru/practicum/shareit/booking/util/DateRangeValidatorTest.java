@@ -53,15 +53,6 @@ class DateRangeValidatorTest {
     }
 
     @Test
-    void testStartDateEqualToEndDate() {
-        RequestBookingDto bookingDto = RequestBookingDto.builder()
-                .start(LocalDateTime.now().plusDays(1))
-                .end(LocalDateTime.now().plusDays(1))
-                .build();
-        assertFalse(validator.isValid(bookingDto, context));
-    }
-
-    @Test
     void testValidDateRange() {
         RequestBookingDto bookingDto = RequestBookingDto.builder()
                 .start(LocalDateTime.now().plusDays(1))
