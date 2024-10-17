@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.erorr.exception.AccessDeniedException;
 import ru.practicum.shareit.erorr.exception.EntityNotFoundException;
 import ru.practicum.shareit.erorr.exception.ValidationException;
-import ru.practicum.shareit.erorr.ErrorResponse;
 
 @Slf4j
 @RestControllerAdvice
