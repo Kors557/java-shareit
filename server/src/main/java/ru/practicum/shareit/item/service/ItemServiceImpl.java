@@ -19,10 +19,13 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.mapper.BookingMapper;
 import ru.practicum.shareit.mapper.CommentMapper;
 import ru.practicum.shareit.mapper.ItemMapper;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +37,13 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final UserService userServiceImpl;
+    private final ItemRequestService itemRequestServiceImpl;
     private final ItemMapper itemMapper;
     private final BookingService bookingServiceImpl;
     private final CommentMapper commentMapper;
@@ -69,9 +74,9 @@ public class ItemServiceImpl implements ItemService {
 
         items.forEach(item -> {
             List<BookingDtoForItem> bookings = Optional.ofNullable(bookingDtoByItemId.get(item.getId()))
-                    .orElse(emptyList());
+                    .orElse(Collections.emptyList());
             List<CommentDto> comments = Optional.ofNullable(allComments.get(item.getId()))
-                    .orElse(emptyList());
+                    .orElse(Collections.emptyList());
 
             item.setLastBooking(findBooking(bookings, true));
             item.setNextBooking(findBooking(bookings, false));
@@ -82,6 +87,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Map<Long, List<BookingDtoForItem>> getBookingsForItems(List<Long> itemIds) {
+        log.debug("Get bookings for items {}", itemIds);
         Map<Long, List<Booking>> bookingsByItemId = bookingServiceImpl.getBookingsForItems(itemIds);
         return bookingsByItemId.entrySet().stream()
                 .collect(Collectors.toMap(
@@ -93,6 +99,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Map<Long, List<CommentDto>> getCommentsForItems(List<Long> itemIds) {
+        log.debug("Get comments for items {}", itemIds);
         return commentRepository.findAllByItemId(itemIds)
                 .stream()
                 .map(commentMapper::mapToCommentDto)
@@ -100,6 +107,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private BookingDtoForItem findBooking(List<BookingDtoForItem> bookings, boolean last) {
+        log.debug("Find next or previous bookings for items");
         if (last) {
             return bookings.stream()
                     .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
@@ -131,8 +139,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Item> getItemsByText(String text) {
+    public List<Item> getItemsByText(long userId, String text) {
         log.info("Getting items by text {}", text);
+        checkOwnerExist(userId);
         if (text == null || text.isEmpty()) {
             return emptyList();
         }
@@ -140,11 +149,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public Item addItem(long userId, ItemDto itemDto) {
         log.info("Adding item {}", itemDto);
         User owner = userServiceImpl.getUser(userId);
         Item item = itemMapper.mapToItem(itemDto);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestServiceImpl.getRequestById(owner.getId(), itemDto.getRequestId());
+            item.setRequest(itemRequest);
+        }
         item.setOwner(owner);
         Item saveItem = itemRepository.save(item);
         log.info("Item saved {}", saveItem);
@@ -152,7 +164,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public Comment addComment(long userId, long itemId, CommentDto commentDto) {
         log.info("Adding comment {}", commentDto);
         User user = userServiceImpl.getUser(userId);
@@ -172,7 +183,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public Item updateItem(long userId, long itemId, ItemDto itemDto) {
         log.info("Updating existing item: {}", itemDto);
         checkOwnerExist(userId);
@@ -189,6 +199,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkOwnerExist(long userId) {
+        log.debug("Checking if owner is exist ID {}", userId);
         userServiceImpl.getUser(userId);
     }
 }

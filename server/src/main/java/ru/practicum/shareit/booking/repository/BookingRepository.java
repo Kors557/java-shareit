@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             where (b.booker.id = ?2 and b.id = ?1)
             or (i.owner.id = ?2 and b.id = ?1)
             """)
-    Optional<Booking> getBookingIfOwnedByUser(long bookingId, long bookerId);
+    Optional<Booking> getUserBookingById(long bookingId, long bookerId);
 
     List<Booking> findByBookerIdAndStatusOrderByStartDesc(long bookerId, BookingStatus status);
 
@@ -28,7 +28,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             select b from Booking b
             where b.booker.id = ?1
             and b.start < ?2 and b.end >= ?2
-            order by b.start desc
+            order by b.start
             """)
     List<Booking> findAllByBookerIdAndCurrentTime(Long bookerId, LocalDateTime currentTime);
 
