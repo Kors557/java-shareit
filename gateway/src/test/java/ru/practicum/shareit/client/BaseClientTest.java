@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -216,5 +217,29 @@ public class BaseClientTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expectedBody, response.getBody());
         mockServer.verify();
+    }
+
+    @Test
+    void prepareGatewayResponse_success() {
+        ResponseEntity<Object> response = ResponseEntity.ok().body("success");
+        ResponseEntity<Object> gatewayResponse = baseClient.prepareGatewayResponse(response);
+        assertEquals(HttpStatus.OK, gatewayResponse.getStatusCode());
+        assertEquals("success", gatewayResponse.getBody());
+    }
+
+    @Test
+    void prepareGatewayResponse_error() {
+        ResponseEntity<Object> response = ResponseEntity.badRequest().body("error");
+        ResponseEntity<Object> gatewayResponse = baseClient.prepareGatewayResponse(response);
+        assertEquals(HttpStatus.BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals("error", gatewayResponse.getBody());
+    }
+
+    @Test
+    void prepareGatewayResponse_emptyBody() {
+        ResponseEntity<Object> response = ResponseEntity.badRequest().build();
+        ResponseEntity<Object> gatewayResponse = baseClient.prepareGatewayResponse(response);
+        assertEquals(HttpStatus.BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertNull(gatewayResponse.getBody());
     }
 }
