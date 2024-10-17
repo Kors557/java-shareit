@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -197,6 +198,24 @@ public class BaseClientTest {
 
         ResponseEntity<Object> response = baseClient.post(path, body);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        mockServer.verify();
+    }
+
+    @Test
+    public void testPatchWithUserIdSuccess() {
+        String path = "/test";
+        long userId = 1L;
+        Map<String, String> body = new HashMap<>();
+        body.put("key", "updatedValue");
+
+        mockServer.expect(requestTo(path))
+                .andRespond(withSuccess("{\"message\":\"updated with userId\"}", MediaType.APPLICATION_JSON));
+
+        ResponseEntity<Object> response = baseClient.patch(path, userId, body);
+        Map<String, String> expectedBody = new HashMap<>();
+        expectedBody.put("message", "updated with userId");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedBody, response.getBody());
         mockServer.verify();
     }
 }

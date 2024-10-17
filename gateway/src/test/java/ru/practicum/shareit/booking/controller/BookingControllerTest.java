@@ -21,8 +21,13 @@ import java.time.LocalDateTime;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -174,5 +179,87 @@ public class BookingControllerTest {
                 .andDo(print());
 
         verifyNoInteractions(bookingClient);
+    }
+
+    @Test
+    @SneakyThrows
+    public void createBookingWithInvalidStartData() {
+        final RequestBookingDto invalidStartDto = RequestBookingDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.of(2021, 1, 7, 0, 0, 0))
+                .end(LocalDateTime.of(2027, 1, 7, 0, 0, 0))
+                .build();
+
+        mockMvc.perform(post("/bookings")
+                        .header("X-Sharer-User-Id", "1")
+                        .content(mapper.writeValueAsString(invalidStartDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    public void createBookingWithInvalidEndData() {
+        final RequestBookingDto invalidStartDto = RequestBookingDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.of(2026, 1, 7, 0, 0, 0))
+                .end(LocalDateTime.of(2021, 1, 7, 0, 0, 0))
+                .build();
+
+        mockMvc.perform(post("/bookings")
+                        .header("X-Sharer-User-Id", "1")
+                        .content(mapper.writeValueAsString(invalidStartDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @SneakyThrows
+    public void createBookingStartAndEndDataEquals() {
+        final RequestBookingDto invalidStartDto = RequestBookingDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.of(2026, 1, 7, 0, 0, 0))
+                .end(LocalDateTime.of(2026, 1, 7, 0, 0, 0))
+                .build();
+
+        mockMvc.perform(post("/bookings")
+                        .header("X-Sharer-User-Id", "1")
+                        .content(mapper.writeValueAsString(invalidStartDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @SneakyThrows
+    public void createBookingStartIsBeforeEndDataEquals() {
+        final RequestBookingDto invalidStartDto = RequestBookingDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.of(2027, 1, 7, 0, 0, 0))
+                .end(LocalDateTime.of(2026, 1, 7, 0, 0, 0))
+                .build();
+
+        mockMvc.perform(post("/bookings")
+                        .header("X-Sharer-User-Id", "1")
+                        .content(mapper.writeValueAsString(invalidStartDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @SneakyThrows
+    public void createBookingWithoutStartAndEndTime() {
+        final RequestBookingDto invalidStartDto = RequestBookingDto.builder()
+                .itemId(1L)
+                .build();
+
+        mockMvc.perform(post("/bookings")
+                        .header("X-Sharer-User-Id", "1")
+                        .content(mapper.writeValueAsString(invalidStartDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }
