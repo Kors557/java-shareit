@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public class DateRangeValidator implements ConstraintValidator<ValidDateRange, RequestBookingDto> {
 
-    private static final LocalDateTime CURRENT_LOCAL_DATA_TIME = LocalDateTime.now();
+    private static LocalDateTime CURRENT_LOCAL_DATA_TIME = LocalDateTime.now();
 
     @Override
     public void initialize(ValidDateRange constraintAnnotation) {
