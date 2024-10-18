@@ -18,6 +18,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             """)
     List<Item> searchItemsWithTextFilter(String text);
 
+    List<Item> findByNameContainingOrDescriptionContainingAndAvailableTrue(String text);
+
     @Query("""
             select i
             from Item as i

@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = true)
 public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository itemRequestRepository;
@@ -51,6 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRequestDto getRequestByIdWithItems(long userId, long requestId) {
         log.info("Get ItemRequest with ID {}", requestId);
         getRequestor(userId);
@@ -62,6 +62,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> getUserRequests(long userId, Integer from, Integer size) {
         log.info("Get User requests with ID {}", userId);
         getRequestor(userId);
@@ -76,6 +77,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> getAllRequests(long userId, Integer from, Integer size) {
         log.info("Get All Request");
         Pageable pageable = createPageable(from, size, Sort.by(Sort.Direction.DESC, "created"));
@@ -88,6 +90,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRequest getRequestById(long userId, long requestId) {
         log.info("Get Request with ID {}", requestId);
         return itemRequestRepository
