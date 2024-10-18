@@ -41,7 +41,6 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
-    @Transactional
     public Booking addBooking(long bookerId, RequestBookingDto requestBookingDto) {
         log.info("Adding booking: {}", requestBookingDto);
         User booker = userServiceImpl.getUser(bookerId);
@@ -64,7 +63,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public Booking handleBookingApproval(long ownerId, long bookingId, boolean approved) {
         log.info("Handling booking approval for user ID: {}, bookingId: {}", ownerId, bookingId);
         Booking booking = bookingRepository.findById(bookingId)
@@ -82,7 +80,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Booking getUserBookingById(long bookerId, long bookingId) {
         log.info("Get booking ID {} for user ID {} ", bookingId, bookerId);
         return bookingRepository.getUserBookingById(bookingId, bookerId)
@@ -114,7 +111,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Booking> getAllOwnerBooking(long ownerId, State state, Integer from, Integer size) {
         log.info("Get all bookings for owner ID {} with state {}", ownerId, state);
         userServiceImpl.getUser(ownerId);
@@ -137,7 +133,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public BookingDtoForItem getBookingForItem(long itemId, String bookingType) {
         log.info("Get booking for item ID {} with time period {}", itemId, bookingType);
         Booking bookingForItem = switch (bookingType) {
@@ -156,7 +151,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Booking> getBookingsForComment(long itemId, long bookerId) {
         log.info("Get booking for item ID {} for comment users id {}", itemId, bookerId);
         return bookingRepository.findBookingForComment(itemId, bookerId, LocalDateTime.now());
